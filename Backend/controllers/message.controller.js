@@ -1,4 +1,4 @@
-// For chating
+// For chatting
 
 import { Conversation } from "../models/conversetion.model.js";
 import { Message } from "../models/message.model.js";
@@ -29,7 +29,7 @@ export const sendMessage = async (req, res) => {
     const newMessage = await Message.create({
       senderId,
       receiverId,
-      message,
+      message
     });
 
     if (newMessage) conversation.messages.push(newMessage._id);
@@ -50,11 +50,11 @@ export const sendMessage = async (req, res) => {
 
 export const getMessage = async (req, res) => {
   try {
-    const recevierId = req.params.id;
+    const receiverId = req.params.id;
     const senderId = req.id;
 
     const conversation = await Conversation.findOne({
-      participants: { $all: [senderId, recevierId] },
+      participants: { $all: [senderId, receiverId] },
     }).populate("messages");
 
     if (!conversation) {

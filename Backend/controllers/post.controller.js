@@ -57,7 +57,7 @@ export const getAllPosts = async (req, res)=>{
             sort:{createdAt:-1},
             populate:{
                 path:'author',
-                select:'username profileaPicture'
+                select:'username profilePicture'
             }
         })
         return res.status(200).json({
@@ -219,13 +219,13 @@ export const addComment = async(req, res)=>{
 export const getCommentsOfPost = async(req,res)=>{
     try {
         const postId = req.params.id;
-        const comments = await Comment.find({postId})
+        const comments = await Comment.find({post:postId}).populate('author', 'username, profilePicture')
 
-        if(!comments) return res.status(404).json({message:'No comment yet'});
+        if(!comments) return res.status(404).json({message:'No comment yet', success:false});
 
         return res.status(200).json({            
-            comments,
-            success:true
+            success:true,
+            comments
         });
     } catch (error) {
         console.log(error);        
@@ -274,7 +274,7 @@ export const bookmarkedPost = async(req,res)=>{
             //already bookmarked -> remove from bookmarks
             await user.updateOne({$pull:{bookmarks:post._id}})
             await user.save();
-            return res.status(200).json({message:'Removed from bookmark',type:'unsaved',success:true})
+            return res.status(200).json({type:'unsaved', message:'Removed from bookmark', success:true})
         }else{
             //save to bookmarks                      
             await user.updateOne({$addToSet:{bookmarks:post._id}})

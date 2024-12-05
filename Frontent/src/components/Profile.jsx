@@ -38,8 +38,8 @@ const Profile = () => {
       const response = await axios.post(
         `http://localhost:3000/api/v2/user/followorunfollow/${userId}`,
         null,
-        {          
-          withCredentials:true,
+        {
+          withCredentials: true,
         }
       );
 
@@ -49,7 +49,9 @@ const Profile = () => {
         const updatedFollowers = isFollowing
           ? userProfile.followers.filter((id) => id !== user._id)
           : [...userProfile.followers, user._id];
-        dispatch(setUserProfile({ ...userProfile, followers: updatedFollowers }));
+        dispatch(
+          setUserProfile({ ...userProfile, followers: updatedFollowers })
+        );
       }
     } catch (error) {
       console.error("Error following/unfollowing user:", error);
@@ -121,25 +123,13 @@ const Profile = () => {
                 )}
               </div>
               <div className="flex items-center gap-10">
-                <p>
-                  <span className="font-semibold">
-                    {userProfile?.posts.length}
-                  </span>{" "}
-                  Posts
-                </p>
-                <Button variant='secondary' className="cursor-pointer">
-                 
-                  <span className="font-semibold">
-                    {userProfile?.followers.length}
-                  </span>{" "}
-                  followers
-                  </Button>
-                <p className="cursor-pointer">
-                  <span className="font-semibold">
-                    {userProfile?.following.length}
-                  </span>{" "}
-                  following
-                </p>
+                <p>{userProfile?.posts.length} Posts</p>
+                <Button variant="ghost" className="cursor-pointer">
+                  {userProfile?.followers.length} followers
+                </Button>
+                <Button variant="ghost" className="cursor-pointer">
+                  {userProfile?.following.length} following
+                </Button>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="font-semibold">
@@ -192,10 +182,7 @@ const Profile = () => {
             {displayPost &&
               displayPost?.map((post) => {
                 return (
-                  <div
-                    key={post._id}
-                    className="relative group cursor-pointer"
-                  >
+                  <div key={post._id} className="relative group cursor-pointer">
                     <img
                       src={post.image}
                       alt="post image"

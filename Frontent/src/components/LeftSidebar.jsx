@@ -56,7 +56,7 @@ const LeftSidebar = () => {
         dispatch(setSuggestedUsers([]));
         dispatch(setSelectedUser(null));
         dispatch(setBookmarkedPost([]));
-        dispatch(setNewNotification([]))
+        dispatch(setNewNotification([]));
 
         navigate("/login");
         toast.success(res.data.message);

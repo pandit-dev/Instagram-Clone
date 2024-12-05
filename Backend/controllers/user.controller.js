@@ -10,7 +10,7 @@ export const signup = async (req, res)=>{
         const {username, email, password}= req.body;
         if(!username || !email || !password){
             return res.status(401).json({
-                message:"Somethig is missing, please check !",
+                message:"Something is missing, please check !",
                 success:false,
             })
         }

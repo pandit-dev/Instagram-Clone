@@ -100,6 +100,7 @@ const Post = ({ post }) => {
         );
         dispatch(setPosts(updatedPostData));
         toast.success(res.data.message);
+        // setComment(updatedCommentData)
         setText("");
       }
     } catch (error) {
@@ -126,7 +127,7 @@ const Post = ({ post }) => {
     }
   };
 
-  const bookmarHandler = async () => {
+  const bookmarkHandler = async () => {
     try {
       const res = await axios.get(
         `http://localhost:3000/api/v2/post/${post?._id}/bookmark`,
@@ -222,12 +223,12 @@ const Post = ({ post }) => {
         <div>
           {bookmarked ? (
             <BookmarkCheck
-            onClick={bookmarHandler}
+            onClick={bookmarkHandler}
               className="cursor-pointer hover:text-gray-600"
             />
           ) : (
             <Bookmark
-            onClick={bookmarHandler}
+            onClick={bookmarkHandler}
               className="cursor-pointer hover:text-gray-600"
             />
           )}
