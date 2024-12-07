@@ -12,16 +12,16 @@ import Comment from "./comment";
 
 const CommentDialog = ({ open, setOpen }) => {
   const [text, setText] = useState("");
-  const [comment, setComment] = useState("")
+  const [localComments, setLocalComments] = useState([]);
   const { selectedPost, posts } = useSelector((store) => store.post);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if(selectedPost){
-      setComment(selectedPost.comments)
+    if (selectedPost) {
+      // Sync local comments with selectedPost comments
+      setLocalComments(selectedPost.comments || []);
     }
-  }, [selectedPost, setComment])
-  
+  }, [selectedPost]);
 
   const changeEventHandler = (e) => {
     setText(e.target.value);
@@ -39,20 +39,27 @@ const CommentDialog = ({ open, setOpen }) => {
           withCredentials: true,
         }
       );
-      if (res.data.success) {
-        const updatedCommentData = [...comment, res.data.comment];
-        setComment(updatedCommentData);
 
-        const updatedPostData = posts.map((p) =>
-          p._id === selectedPost._id ? { ...p, comments: updatedCommentData } : p
+      if (res.data.success) {
+        const newComment = res.data.comment;
+
+        // Update local comments for real-time rendering
+        setLocalComments((prev) => [newComment, ...prev]);
+
+        // Update Redux state immutably
+        const updatedPosts = posts.map((p) =>
+          p._id === selectedPost._id
+            ? { ...p, comments: [newComment, ...p.comments] }
+            : p
         );
-        dispatch(setPosts(updatedPostData));
+        dispatch(setPosts(updatedPosts));
+
         toast.success(res.data.message);
         setText("");
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.error);
+      console.error(error);
+      toast.error(error.response?.data?.error || "Something went wrong");
     }
   };
 
@@ -71,45 +78,43 @@ const CommentDialog = ({ open, setOpen }) => {
             />
           </div>
           <div className="w-1/2 flex flex-col justify-between">
-          <div className="flex flex-col">
-            <div className="flex items-center justify-between p-4">
-
-              <div className="flex gap-3 items-center">
-                <Link>
-                  <Avatar >
-                    <AvatarImage src={selectedPost?.author?.profilePicture} />
-                    <AvatarFallback>
-                      <UserCircle2 />
-                    </AvatarFallback>
-                  </Avatar>
-                </Link>
-                <div>
-                  <Link className="font-bold">{selectedPost?.author?.username}</Link>
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between p-4">
+                <div className="flex gap-3 items-center">
+                  <Link>
+                    <Avatar>
+                      <AvatarImage src={selectedPost?.author?.profilePicture} />
+                      <AvatarFallback>
+                        <UserCircle2 />
+                      </AvatarFallback>
+                    </Avatar>
+                  </Link>
+                  <div>
+                    <Link className="font-bold">
+                      {selectedPost?.author?.username}
+                    </Link>
+                  </div>
                 </div>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <MoreHorizontal className="cursor-pointer" />
+                  </DialogTrigger>
+                  <DialogContent className="flex flex-col items-center text-sm text-center">
+                    <div className="cursor-pointer w-full text-red-400 font-bold">
+                      Unfollow
+                    </div>
+                    <div className="cursor-pointer w-full">Add to favorite</div>
+                  </DialogContent>
+                </Dialog>
               </div>
-
-              <Dialog>
-                <DialogTrigger asChild>
-                  <MoreHorizontal className="cursor-pointer" />
-                </DialogTrigger>
-                <DialogContent className="flex flex-col items-center text-sm text-center">
-                  <div className="cursor-pointer w-full text-red-400 font-bold">Unfollow</div>
-                  <div className="cursor-pointer w-full">Add to favorite</div>
-                </DialogContent>
-              </Dialog>
+              <hr />
+              <div className="flex-1 overflow-y-auto max-h-96 px-4">
+                {/* Render comments from localComments */}
+                {localComments.map((comment) => (
+                  <Comment key={comment._id} comment={comment} />
+                ))}
+              </div>
             </div>
-            
-
-            <hr />
-            
-            <div className="flex-1 overflow-y-auto max-h-96 px-4">
-              {selectedPost?.comments.map((comment) => (
-                <Comment key={comment._id} comment={comment} />
-              ))}
-            </div>
-            </div>
-
-
             <div className="p-4">
               <div className="flex">
                 <input
@@ -134,5 +139,8 @@ const CommentDialog = ({ open, setOpen }) => {
     </Dialog>
   );
 };
+
+
+
 
 export default CommentDialog;
