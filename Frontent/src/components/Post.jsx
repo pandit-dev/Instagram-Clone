@@ -36,7 +36,7 @@ const Post = ({ post }) => {
   );
   const [postLike, setPostLike] = useState(post.likes.length);
   const [comment, setComment] = useState(post.comments);
-  // const [postBookmark, setPostBookmark] = useState(user.bookmarks.includes(selectedPost?._id) || false);
+ 
   const dispatch = useDispatch();
 
   const onchangeHandler = (e) => {
@@ -93,14 +93,14 @@ const Post = ({ post }) => {
       );
       if (res.data.success) {
         const updatedCommentData = [...comment, res.data.comment];
-        setComment(updatedCommentData);
+        // setComment(updatedCommentData);
 
         const updatedPostData = posts.map((p) =>
           p._id === post._id ? { ...p, comments: updatedCommentData } : p
         );
         dispatch(setPosts(updatedPostData));
         toast.success(res.data.message);
-        // setComment(updatedCommentData)
+        setComment(updatedCommentData)
         setText("");
       }
     } catch (error) {

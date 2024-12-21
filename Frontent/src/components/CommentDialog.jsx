@@ -16,12 +16,23 @@ const CommentDialog = ({ open, setOpen }) => {
   const { selectedPost, posts } = useSelector((store) => store.post);
   const dispatch = useDispatch();
 
+  // useEffect(() => {
+  //   if (selectedPost) {
+  //     // Sync local comments with selectedPost comments
+  //     setLocalComments(selectedPost.comments || []);
+  //   }
+  // }, [selectedPost]);
+
   useEffect(() => {
     if (selectedPost) {
-      // Sync local comments with selectedPost comments
-      setLocalComments(selectedPost.comments || []);
+      // Sort comments by date in descending order (newest first)
+      const sortedComments = [...selectedPost.comments].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setLocalComments(sortedComments);
     }
   }, [selectedPost]);
+  
 
   const changeEventHandler = (e) => {
     setText(e.target.value);
@@ -43,16 +54,17 @@ const CommentDialog = ({ open, setOpen }) => {
       if (res.data.success) {
         const newComment = res.data.comment;
 
-        // Update local comments for real-time rendering
-        setLocalComments((prev) => [newComment, ...prev]);
-
+        
         // Update Redux state immutably
         const updatedPosts = posts.map((p) =>
           p._id === selectedPost._id
-            ? { ...p, comments: [newComment, ...p.comments] }
-            : p
-        );
-        dispatch(setPosts(updatedPosts));
+        ? { ...p, comments: [newComment, ...p.comments] }
+        : p
+      );
+      dispatch(setPosts(updatedPosts));
+      
+      // Update local comments for real-time rendering
+      setLocalComments((prev) => [newComment, ...prev]);
 
         toast.success(res.data.message);
         setText("");
@@ -70,7 +82,7 @@ const CommentDialog = ({ open, setOpen }) => {
         className="max-w-5xl p-0 flex flex-col"
       >
         <div className="flex flex-1">
-          <div className="w-1/2">
+          <div className="w-1/2 flex flex-auto">
             <img
               src={selectedPost?.image}
               alt="Post"

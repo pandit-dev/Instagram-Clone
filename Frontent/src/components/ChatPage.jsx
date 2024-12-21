@@ -58,7 +58,7 @@ const ChatPage = () => {
             return (
               <div
                 key={suggestedUser?._id}
-                onClick={() => dispatch(setSelecteduser(suggestedUser))}
+                onClick={() => dispatch(setSelectedUser(suggestedUser))}
                 className="flex gap-3 items-center p-3 hover:bg-gray-50 cursor-pointer"
               >
                 <Avatar>
